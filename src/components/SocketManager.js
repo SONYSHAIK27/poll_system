@@ -15,7 +15,6 @@ export const useSocket = () => {
 export const SocketManager = ({ children }) => {
   const [socket, setSocket] = useState(null);
   const [connectionStatus, setConnectionStatus] = useState('connecting'); // 'connecting', 'connected', 'failed'
-  const [pollingService, setPollingService] = useState(null);
 
   useEffect(() => {
     console.log("🔍 Environment check:", {
@@ -26,7 +25,6 @@ export const SocketManager = ({ children }) => {
     // ALWAYS use polling service - no Socket.IO
     console.log("🌐 Using polling service for all environments");
     const service = new PollingService();
-    setPollingService(service);
     setSocket(service);
     setConnectionStatus('connected');
     service.startPolling();
