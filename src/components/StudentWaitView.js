@@ -1,55 +1,58 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSocket } from './SocketManager';
+import { usePolling } from './PollingManager';
 import { useNavigate } from 'react-router-dom';
 import '../styles/StudentWaitView.css';
 
 const StudentWaitView = () => {
-  const socket = useSocket();
+  const { socket, connectionStatus, isSocketConnected } = useSocket();
+  const { currentPoll, joinAsStudent, isConnected } = usePolling();
   const navigate = useNavigate();
+  const [studentId] = useState(() => `student_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
 
+  // Handle Socket.IO connection
   useEffect(() => {
-    if (!socket) {
-      console.log("❌ No socket available in StudentWaitView");
-      return;
+    if (isSocketConnected && socket) {
+      console.log("✅ Using Socket.IO connection");
+      
+      const handlePollQuestion = (pollData) => {
+        console.log("🎯 Received a new poll via Socket.IO:", pollData);
+        navigate('/student/poll', { state: { pollData } });
+      };
+
+      const handleKicked = () => {
+        console.log("🚫 Student was kicked out");
+        navigate('/kicked-out');
+      };
+
+      socket.on('poll:question', handlePollQuestion);
+      socket.on('student:kicked', handleKicked);
+      
+      return () => {
+        socket.off('poll:question', handlePollQuestion);
+        socket.off('student:kicked', handleKicked);
+      };
     }
+  }, [isSocketConnected, socket, navigate]);
 
-    console.log("✅ Socket available in StudentWaitView, setting up listeners");
-    
-    // Listen for a new poll from the teacher
-    const handlePollQuestion = (pollData) => {
-      console.log("🎯 Received a new poll:", pollData);
-      // When a poll is received, navigate to the student's poll page
-      navigate('/student/poll', { state: { pollData } });
-    };
+  // Handle polling fallback
+  useEffect(() => {
+    if (connectionStatus === 'failed' || (!isSocketConnected && connectionStatus !== 'connecting')) {
+      console.log("🔄 Using polling fallback");
+      
+      // Join as student using polling
+      const studentName = sessionStorage.getItem('studentName') || 'Student';
+      joinAsStudent(studentName, studentId);
+    }
+  }, [connectionStatus, isSocketConnected, joinAsStudent, studentId]);
 
-    const handleKicked = () => {
-      console.log("🚫 Student was kicked out");
-      navigate('/kicked-out');
-    };
-
-    // Add debugging for connection events
-    const handleConnect = () => {
-      console.log("✅ Socket connected in StudentWaitView");
-    };
-
-    const handleDisconnect = () => {
-      console.log("❌ Socket disconnected in StudentWaitView");
-    };
-
-    socket.on('poll:question', handlePollQuestion);
-    socket.on('student:kicked', handleKicked);
-    socket.on('connect', handleConnect);
-    socket.on('disconnect', handleDisconnect);
-    
-    // Clean up the event listener to prevent it from being added multiple times
-    return () => {
-      console.log("Cleaning up StudentWaitView socket listeners");
-      socket.off('poll:question', handlePollQuestion);
-      socket.off('student:kicked', handleKicked);
-      socket.off('connect', handleConnect);
-      socket.off('disconnect', handleDisconnect);
-    };
-  }, [socket, navigate]);
+  // Handle new poll from polling
+  useEffect(() => {
+    if (currentPoll && !isSocketConnected) {
+      console.log("🎯 Received a new poll via polling:", currentPoll);
+      navigate('/student/poll', { state: { pollData: currentPoll } });
+    }
+  }, [currentPoll, isSocketConnected, navigate]);
 
   return (
     <div className="centered-container">

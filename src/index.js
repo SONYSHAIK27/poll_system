@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { SocketManager } from './components/SocketManager';
+import { PollingManager } from './components/PollingManager';
 import './styles/App.css';
 import RoleSelection from './components/RoleSelection';
 import StudentNameEntry from './components/StudentNameEntry';
@@ -37,7 +38,9 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <SocketManager>
-      <App />
+      <PollingManager>
+        <App />
+      </PollingManager>
     </SocketManager>
   </React.StrictMode>
 );
