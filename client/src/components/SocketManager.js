@@ -10,7 +10,10 @@ export const SocketManager = ({ children }) => {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const serverUrl = "http://localhost:5000";
+    // Use local server for development, deployed server for production
+    const serverUrl = process.env.NODE_ENV === 'production' 
+      ? "https://poll-system-fgmos3tvd-sonys-projects-eca9a033.vercel.app"
+      : "http://localhost:5000";
     const newSocket = io(serverUrl, {
       transports: ['polling', 'websocket'],
       timeout: 20000,
