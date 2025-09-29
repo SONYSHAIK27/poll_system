@@ -1,0 +1,51 @@
+.centered-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  text-align: center;
+}
+
+.centered-content {
+  color: white;
+  text-align: center;
+}
+
+.logo-badge {
+  background: linear-gradient(135deg, var(--purple-light), var(--purple-dark));
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  color: white;
+}
+
+.centered-content h1 {
+  margin-top: 1rem;
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  border: 5px solid var(--card-bg);
+  border-radius: 50%;
+  border-top-color: var(--purple-light);
+  animation: spin 1s ease-in-out infinite;
+  -webkit-animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { -webkit-transform: rotate(360deg); }
+}
+@-webkit-keyframes spin {
+  to { -webkit-transform: rotate(360deg); }
+}
+
+.wait-message {
+  color: var(--dark-bg);
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-top: 2rem;
+}

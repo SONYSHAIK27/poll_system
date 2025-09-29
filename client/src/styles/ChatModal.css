@@ -1,0 +1,144 @@
+/* This overlay should cover the whole screen and be transparent, allowing content below to be seen */
+.chat-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.0); /* Make it fully transparent or very slightly visible */
+  pointer-events: none; /* Allows clicks to pass through to elements below the overlay */
+  z-index: 999; /* Lower z-index than content, but above regular page elements */
+  display: flex; /* Keep flex to allow absolute positioning of content */
+}
+
+/* The actual modal content (the white box with chat/participants) */
+.chat-modal-content {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  /* Positioning and sizing for the modal */
+  position: absolute; /* Position it absolutely within the overlay */
+  bottom: 80px; /* Distance from the bottom (adjust as needed, near chat icon) */
+  right: 20px; /* Distance from the right (adjust as needed, near chat icon) */
+  width: 90%; /* Default width for responsiveness */
+  max-width: 320px; /* Reduced max-width for a smaller pop-up, like in Image 2 but smaller */
+  min-height: 250px; /* Ensure it has some height */
+  pointer-events: auto; /* Re-enable pointer events for the modal content itself */
+  z-index: 1000; /* Higher z-index to make sure it appears above the overlay */
+}
+
+.chat-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f2f2f2;
+  padding: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.tabs {
+  display: flex;
+  gap: 10px;
+}
+
+.tab-button {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0.5rem;
+  color: #8e8e8e;
+  transition: color 0.2s ease;
+}
+
+.tab-button.active {
+  color: var(--purple-dark);
+  border-bottom: 2px solid var(--purple-dark);
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #8e8e8e;
+}
+
+.chat-modal-body {
+  padding: 1rem;
+  flex-grow: 1;
+  height: 300px; /* Adjust height as needed */
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-tab {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  justify-content: space-between;
+}
+
+.message-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 1rem;
+}
+
+.chat-message {
+  padding: 0.75rem;
+  border-radius: 15px;
+  max-width: 80%;
+}
+
+.user-1 {
+  background-color: var(--purple-light);
+  color: white;
+  align-self: flex-start;
+}
+
+.user-2 {
+  background-color: #e0e0e0;
+  color: black;
+  align-self: flex-end;
+}
+
+.chat-input-container {
+  display: flex;
+  gap: 10px;
+}
+
+.chat-input-container input {
+  flex-grow: 1;
+  border: 1px solid #e0e0e0;
+  border-radius: 20px;
+  padding: 0.75rem 1rem;
+}
+
+.send-button {
+  background: linear-gradient(135deg, var(--purple-light), var(--blue));
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+}
+
+.participants-tab ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.participants-tab li {
+  padding: 0.5rem 0;
+  font-weight: bold;
+  color: var(--dark-bg);
+  border-bottom: 1px solid #e0e0e0;
+}

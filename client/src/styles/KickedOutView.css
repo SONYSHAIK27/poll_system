@@ -1,0 +1,30 @@
+.kicked-out-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  text-align: center;
+  background-color: var(--dark-bg);
+  color: white;
+}
+
+.kicked-out-card {
+  background-color: white;
+  color: var(--dark-bg);
+  padding: 3rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+}
+
+.kicked-out-card h1 {
+  font-size: 2.5rem;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.kicked-out-card p {
+  color: var(--dark-bg);
+  font-size: 0.9rem;
+}

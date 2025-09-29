@@ -1,0 +1,242 @@
+/* General container for the entire page */
+.live-results-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: white; /* Changed to white background */
+  position: relative;
+  padding: 2rem;
+}
+
+/* Top Right Section for "View Poll History" */
+.top-right-section {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  z-index: 10;
+}
+
+.view-history-button {
+  background: linear-gradient(135deg, var(--purple-light), var(--blue));
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 0.75rem 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.view-history-button:hover {
+  transform: translateY(-2px);
+}
+
+.eye-icon {
+  font-size: 1.1rem;
+}
+
+/* Main results card styling */
+.results-card {
+  background-color: var(--card-bg);
+  color: var(--dark-bg);
+  padding: 2rem;
+  border-radius: 6px; /* Updated from 10px */
+  border: 1px solid #e0e0e0; /* Added a 1px border */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  width: 80%;
+  max-width: 600px; /* Updated to match Figma width */
+  text-align: left;
+  margin-top: 5rem;
+}
+
+/* History page wider centered card */
+.history-card {
+  width: 90%;
+  max-width: 800px;
+  margin-top: 2rem;
+}
+
+.results-question-label {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333; /* Darker text for "Question" label */
+  margin-bottom: 0.5rem;
+}
+
+.question-display-box {
+  background-color: var(--dark-bg); /* Dark background for question box */
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.question-text {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+/* Options list styling (similar to student, but with progress bars) */
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem; /* Reduced gap */
+}
+
+.option-result-item {
+  display: flex;
+  flex-direction: column; /* Stack elements vertically */
+  align-items: flex-start;
+  background-color: white;
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  gap: 0.1rem;
+}
+
+.option-label {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: 1rem;
+  font-weight: bold;
+  color: var(--dark-bg);
+  margin-bottom: 0.5rem;
+}
+
+.option-number {
+  background-color: var(--purple-light); /* Purple for numbers */
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.progress-bar-container {
+  width: 100%; /* Ensure the bar takes full width */
+  background-color: #e0e0e0;
+  border-radius: 5px;
+  height: 20px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: var(--purple-light); /* Purple progress bar */
+  transition: width 0.5s ease-in-out;
+}
+
+.vote-percentage {
+  width: 100%;
+  text-align: right;
+  font-weight: bold;
+  color: var(--dark-bg);
+  font-size: 0.95rem;
+}
+
+/* Ask a new question button */
+.ask-new-question-button {
+  background: linear-gradient(135deg, var(--purple-light), var(--blue));
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 0.75rem 2rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 2.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.ask-new-question-button:hover {
+  transform: translateY(-2px);
+}
+
+/* Chat icon */
+.chat-icon {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background: linear-gradient(135deg, var(--purple-light), var(--blue));
+  color: white;
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.8rem;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease;
+}
+
+.chat-icon:hover {
+  transform: scale(1.05);
+}
+
+.wait-message {
+  color: var(--dark-bg);
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-top: 2rem;
+}
+
+/* Students side panel */
+.students-panel {
+  position: fixed;
+  top: 6rem;
+  right: 2rem;
+  width: 240px;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  padding: 0.75rem 0.75rem 0.5rem;
+}
+.students-panel h4 {
+  margin: 0 0 0.5rem 0;
+}
+.students-panel ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 260px;
+  overflow: auto;
+}
+.students-panel li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.35rem 0.25rem;
+  border-bottom: 1px dashed #eee;
+}
+.students-panel li:last-child {
+  border-bottom: none;
+}
+.students-panel button {
+  background: #ff5b5b;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+}
+.students-panel .empty {
+  color: #666;
+  margin: 0.5rem 0;
+}
