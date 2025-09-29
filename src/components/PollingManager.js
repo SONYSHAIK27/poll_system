@@ -10,18 +10,14 @@ export const PollingManager = ({ children }) => {
   const [isConnected, setIsConnected] = useState(false);
   const [pollingInterval, setPollingInterval] = useState(null);
 
-  // Check if we're in production mode - use multiple detection methods
-  const isProduction = process.env.NODE_ENV === 'production' || 
-                      window.location.hostname.includes('vercel.app') ||
-                      window.location.hostname.includes('netlify.app') ||
-                      window.location.hostname !== 'localhost';
+  // Check if we're in production mode
+  const isProduction = window.location.hostname !== 'localhost';
   
   const API_BASE = isProduction 
     ? null // Use localStorage for production
     : 'http://localhost:5000';
   
   console.log("🔍 PollingManager environment check:", {
-    NODE_ENV: process.env.NODE_ENV,
     hostname: window.location.hostname,
     isProduction: isProduction,
     API_BASE: API_BASE

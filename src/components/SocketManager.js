@@ -1,5 +1,14 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import io from "socket.io-client";
+
+// Only import Socket.IO in development
+let io = null;
+if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+  try {
+    io = require('socket.io-client');
+  } catch (e) {
+    console.log('Socket.IO not available');
+  }
+}
 
 const SocketContext = createContext();
 export const useSocket = () => {
@@ -11,21 +20,18 @@ export const SocketManager = ({ children }) => {
   const [connectionStatus, setConnectionStatus] = useState('connecting'); // 'connecting', 'connected', 'failed'
 
   useEffect(() => {
-    // Check if we're in production mode - use multiple detection methods
-    const isProduction = process.env.NODE_ENV === 'production' || 
-                        window.location.hostname.includes('vercel.app') ||
-                        window.location.hostname.includes('netlify.app') ||
-                        window.location.hostname !== 'localhost';
+    // Check if we're in production mode
+    const isProduction = window.location.hostname !== 'localhost';
     
     console.log("🔍 Environment check:", {
-      NODE_ENV: process.env.NODE_ENV,
       hostname: window.location.hostname,
-      isProduction: isProduction
+      isProduction: isProduction,
+      ioAvailable: !!io
     });
     
-    if (isProduction) {
-      // Production mode - immediately use localStorage fallback
-      console.log("🌐 Production mode detected - using localStorage fallback (no Socket.IO)");
+    if (isProduction || !io) {
+      // Production mode or Socket.IO not available - use localStorage fallback
+      console.log("🌐 Production mode - using localStorage fallback (Socket.IO disabled)");
       setConnectionStatus('failed'); // This will trigger polling fallback
       setSocket(null); // Ensure no socket is set
       return;
