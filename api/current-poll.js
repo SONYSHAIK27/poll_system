@@ -1,4 +1,4 @@
-// In-memory storage for current poll
+// In-memory storage for current poll (for Vercel API compatibility)
 let currentPoll = null;
 let answeredStudents = new Set();
 let allStudents = new Set();
@@ -34,6 +34,19 @@ export default async function handler(req, res) {
                 pollTime: pollTime || 60,
                 createdAt: new Date().toISOString()
             };
+
+            // Clear any existing timer
+            if (pollTimer) {
+                clearTimeout(pollTimer);
+            }
+
+            // Set timer for poll expiration
+            if (pollTime && pollTime > 0) {
+                pollTimer = setTimeout(() => {
+                    console.log('Poll timer expired via API');
+                    // Timer expired - poll remains active but can be manually closed
+                }, pollTime * 1000);
+            }
 
             res.status(200).json({ success: true, poll: currentPoll });
         } else {

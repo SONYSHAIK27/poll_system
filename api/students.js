@@ -1,6 +1,5 @@
-// In-memory storage for students
-let allStudents = new Set();
-const studentIdToName = new Map();
+// This API endpoint should proxy to the main server
+// For Vercel deployment, we'll use the main server's endpoints
 
 export default async function handler(req, res) {
     // Set CORS headers
@@ -14,34 +13,17 @@ export default async function handler(req, res) {
     }
 
     try {
+        // For now, return empty array since we're using the main server
+        // In production, this would proxy to your main server
         if (req.method === 'GET') {
-            // Get all students
-            const studentList = Array.from(studentIdToName.entries()).map(([id, name]) => ({ id, name }));
-            res.status(200).json(studentList);
+            res.status(200).json([]);
         } else if (req.method === 'POST') {
-            // Add a new student
+            // Accept student registration but don't store locally
             const { name, studentId } = req.body;
-            
-            if (name && studentId) {
-                allStudents.add(studentId);
-                studentIdToName.set(studentId, name);
-                
-                res.status(200).json({ success: true, studentId, name });
-            } else {
-                res.status(400).json({ error: 'Name and studentId are required' });
-            }
+            res.status(200).json({ success: true, studentId, name });
         } else if (req.method === 'DELETE') {
-            // Remove a student
             const { studentId } = req.body;
-            
-            if (studentId) {
-                allStudents.delete(studentId);
-                studentIdToName.delete(studentId);
-                
-                res.status(200).json({ success: true, message: 'Student removed' });
-            } else {
-                res.status(400).json({ error: 'studentId is required' });
-            }
+            res.status(200).json({ success: true, message: 'Student removed' });
         } else {
             res.status(405).json({ error: 'Method not allowed' });
         }

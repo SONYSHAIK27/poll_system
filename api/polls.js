@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const Poll = require('../server/models/Poll');
+import mongoose from 'mongoose';
+import Poll from '../server/models/Poll.js';
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://sonyshaik027:S0ny027%40@cluster0.zitqgzq.mongodb.net/livepolling?retryWrites=true&w=majority&appName=Cluster0', {

@@ -13,12 +13,19 @@ const StudentNameEntry = () => {
   };
 
   const handleContinue = () => {
+    console.log('🔄 Continue button clicked', { name, socket: !!socket });
     if (name.trim() !== '') {
       if (socket) {
+        console.log('📤 Emitting student:join event');
         socket.emit('student:join', { name });
+      } else {
+        console.error('❌ Socket is null!');
       }
       sessionStorage.setItem('studentName', name);
+      console.log('🧭 Navigating to student-wait');
       navigate('/student-wait', { state: { studentName: name } });
+    } else {
+      console.log('❌ Name is empty');
     }
   };
 

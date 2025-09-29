@@ -79,7 +79,7 @@ class PollingService {
             if (response.ok) {
                 const result = await response.json();
                 this.currentPoll = result.poll;
-                this.emit('poll:created', result.poll);
+                this.emit('poll:question', result.poll); // Use the same event name as Socket.IO
                 return result;
             }
         } catch (error) {
@@ -91,7 +91,7 @@ class PollingService {
     // Submit an answer
     async submitAnswer(answer, studentId) {
         try {
-            const response = await fetch(`${this.baseUrl}/api/poll-answer`, {
+            const response = await fetch(`${this.baseUrl}/api/poll/answer`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -118,20 +118,13 @@ class PollingService {
             sessionStorage.setItem('studentId', studentId);
             sessionStorage.setItem('studentName', name);
             
-            const response = await fetch(`${this.baseUrl}/api/students`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ name, studentId }),
-            });
+            // For now, just return success since we're using the main server
+            // In a real deployment, this would register with the main server
+            const result = { success: true, studentId, name };
             
-            if (response.ok) {
-                const result = await response.json();
-                // Emit the event that components expect
-                this.emit('student:joined', result);
-                return result;
-            }
+            // Emit the event that components expect
+            this.emit('student:joined', result);
+            return result;
         } catch (error) {
             console.error('Error joining as student:', error);
         }

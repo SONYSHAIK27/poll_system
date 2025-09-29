@@ -1,5 +1,5 @@
 // server/models/Poll.js
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const pollSchema = new mongoose.Schema({
   question: { type: String, required: true },
@@ -10,4 +10,4 @@ const pollSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('Poll', pollSchema);
+export default mongoose.model('Poll', pollSchema);

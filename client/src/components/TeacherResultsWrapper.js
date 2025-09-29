@@ -28,9 +28,14 @@ const TeacherResultsWrapper = () => {
   }, [currentPoll]);
 
   const handleAskQuestion = (pollData) => {
+    console.log('🔄 Ask question button clicked', { pollData, socket: !!socket });
     if (socket) {
+      console.log('📤 Emitting poll:create event');
       socket.emit('poll:create', pollData);
       setCurrentPoll(pollData);
+      console.log('✅ Poll state updated');
+    } else {
+      console.error('❌ Socket is null!');
     }
   };
   
