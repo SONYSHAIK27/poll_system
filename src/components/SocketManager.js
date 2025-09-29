@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { createMockIO } from '../utils/socketMock';
+import PollingService from '../services/pollingService';
 
 // Import Socket.IO for both development and production
 let io = null;
@@ -23,6 +24,7 @@ export const useSocket = () => {
 export const SocketManager = ({ children }) => {
   const [socket, setSocket] = useState(null);
   const [connectionStatus, setConnectionStatus] = useState('connecting'); // 'connecting', 'connected', 'failed'
+  const [pollingService, setPollingService] = useState(null);
 
   useEffect(() => {
     // Check if we're in production mode
@@ -34,34 +36,42 @@ export const SocketManager = ({ children }) => {
       ioAvailable: !!io
     });
     
-    if (!io) {
-      // Socket.IO not available - use localStorage fallback
-      console.log("🌐 Socket.IO not available - using localStorage fallback");
-      setConnectionStatus('failed'); // This will trigger polling fallback
-      setSocket(null); // Ensure no socket is set
-      return;
+    // For production, use polling service
+    if (isProduction) {
+      console.log("🌐 Production mode - using polling service for Vercel");
+      const service = new PollingService();
+      setPollingService(service);
+      setSocket(service); // Use polling service as socket replacement
+      setConnectionStatus('connected');
+      service.startPolling();
+      return () => {
+        service.disconnect();
+      };
     }
     
-    // Determine server URL based on environment
-    let serverUrl;
-    if (isProduction) {
-      // Production mode - use the same domain (no CORS issues)
-      serverUrl = window.location.origin; // Same domain as frontend
-      console.log("🌐 Production mode - attempting to connect to same domain:", serverUrl);
-    } else {
-      // Development mode - use localhost
-      serverUrl = "http://localhost:5000";
-      console.log("🔌 Development mode - attempting to connect to:", serverUrl);
+    // Only try Socket.IO in development
+    if (!io) {
+      console.log("🌐 Socket.IO not available - using polling fallback");
+      const service = new PollingService();
+      setPollingService(service);
+      setSocket(service);
+      setConnectionStatus('connected');
+      service.startPolling();
+      return () => {
+        service.disconnect();
+      };
     }
+    
+    // Development mode - try Socket.IO
+    const serverUrl = "http://localhost:5000";
+    console.log("🔌 Development mode - attempting to connect to:", serverUrl);
     
     const newSocket = io(serverUrl, {
       transports: ['polling', 'websocket'],
       timeout: 10000,
       forceNew: true,
       autoConnect: true,
-      reconnection: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000
+      reconnection: false
     });
     setSocket(newSocket);
 
