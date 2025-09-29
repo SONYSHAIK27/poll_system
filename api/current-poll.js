@@ -1,9 +1,13 @@
-// In-memory storage for current poll (for Vercel API compatibility)
-let currentPoll = null;
-let answeredStudents = new Set();
-let allStudents = new Set();
-let pollTimer = null;
-const studentIdToName = new Map();
+import { 
+    getCurrentPoll, 
+    setCurrentPoll, 
+    getAnsweredStudents, 
+    clearAnsweredStudents, 
+    getAllStudents,
+    getPollTimer,
+    setPollTimer,
+    clearPollTimer
+} from './shared-state.js';
 
 export default async function handler(req, res) {
     // Set CORS headers
@@ -19,36 +23,37 @@ export default async function handler(req, res) {
     try {
         if (req.method === 'GET') {
             // Get current poll
-            res.status(200).json(currentPoll);
+            res.status(200).json(getCurrentPoll());
         } else if (req.method === 'POST') {
             // Create a new poll
             const { question, options, pollTime } = req.body;
             
             // Clear previous poll data
-            answeredStudents.clear();
+            clearAnsweredStudents();
             
-            currentPoll = {
+            const newPoll = {
                 question,
                 options: options.map(opt => ({ text: opt.text, votes: 0 })),
-                totalStudents: allStudents.size,
+                totalStudents: getAllStudents().size,
                 pollTime: pollTime || 60,
                 createdAt: new Date().toISOString()
             };
 
+            setCurrentPoll(newPoll);
+
             // Clear any existing timer
-            if (pollTimer) {
-                clearTimeout(pollTimer);
-            }
+            clearPollTimer();
 
             // Set timer for poll expiration
             if (pollTime && pollTime > 0) {
-                pollTimer = setTimeout(() => {
+                const timer = setTimeout(() => {
                     console.log('Poll timer expired via API');
                     // Timer expired - poll remains active but can be manually closed
                 }, pollTime * 1000);
+                setPollTimer(timer);
             }
 
-            res.status(200).json({ success: true, poll: currentPoll });
+            res.status(200).json({ success: true, poll: newPoll });
         } else {
             res.status(405).json({ error: 'Method not allowed' });
         }

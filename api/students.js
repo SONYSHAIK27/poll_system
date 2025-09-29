@@ -1,5 +1,11 @@
-// This API endpoint should proxy to the main server
-// For Vercel deployment, we'll use the main server's endpoints
+import { 
+    getAllStudents, 
+    addStudent, 
+    removeStudent, 
+    getStudentName, 
+    setStudentName, 
+    removeStudentName 
+} from './shared-state.js';
 
 export default async function handler(req, res) {
     // Set CORS headers
@@ -13,17 +19,33 @@ export default async function handler(req, res) {
     }
 
     try {
-        // For now, return empty array since we're using the main server
-        // In production, this would proxy to your main server
         if (req.method === 'GET') {
-            res.status(200).json([]);
+            // Get all students
+            const students = Array.from(getAllStudents()).map(studentId => ({
+                id: studentId,
+                name: getStudentName(studentId) || 'Unknown'
+            }));
+            res.status(200).json(students);
         } else if (req.method === 'POST') {
-            // Accept student registration but don't store locally
+            // Add a new student
             const { name, studentId } = req.body;
-            res.status(200).json({ success: true, studentId, name });
+            if (name && studentId) {
+                addStudent(studentId);
+                setStudentName(studentId, name);
+                res.status(200).json({ success: true, studentId, name });
+            } else {
+                res.status(400).json({ error: 'Name and studentId are required' });
+            }
         } else if (req.method === 'DELETE') {
+            // Remove a student
             const { studentId } = req.body;
-            res.status(200).json({ success: true, message: 'Student removed' });
+            if (studentId) {
+                removeStudent(studentId);
+                removeStudentName(studentId);
+                res.status(200).json({ success: true, message: 'Student removed' });
+            } else {
+                res.status(400).json({ error: 'studentId is required' });
+            }
         } else {
             res.status(405).json({ error: 'Method not allowed' });
         }

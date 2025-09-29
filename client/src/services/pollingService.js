@@ -215,6 +215,15 @@ class PollingService {
         } else if (event === 'ai:chat') {
             // Handle AI chat if needed
             console.log('AI chat:', data);
+        } else if (event === 'poll:question') {
+            // Handle new poll question
+            this.emit('poll:update', data);
+        } else if (event === 'question:timerExpired') {
+            // Handle timer expiration
+            this.emit('poll:update', this.currentPoll);
+        } else if (event === 'student:kicked') {
+            // Handle student being kicked
+            console.log('Student kicked:', data);
         }
     }
 

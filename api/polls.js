@@ -6,13 +6,12 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://sonyshaik027:S0ny027%
     serverSelectionTimeoutMS: 20000 
 });
 
-// In-memory storage for current poll (since serverless functions are stateless)
-// In production, you might want to use Redis or another persistent store
-let currentPoll = null;
-let answeredStudents = new Set();
-let allStudents = new Set();
-let pollTimer = null;
-const studentIdToName = new Map();
+import { 
+    getCurrentPoll, 
+    setCurrentPoll, 
+    clearAnsweredStudents, 
+    getAllStudents 
+} from './shared-state.js';
 
 export default async function handler(req, res) {
     // Set CORS headers
@@ -35,12 +34,12 @@ export default async function handler(req, res) {
             const { question, options, pollTime } = req.body;
             
             // Clear previous poll data
-            answeredStudents.clear();
+            clearAnsweredStudents();
             
             const pollData = {
                 question,
                 options: options.map(opt => ({ text: opt.text, votes: 0 })),
-                totalStudents: allStudents.size,
+                totalStudents: getAllStudents().size,
                 pollTime: pollTime || 60,
             };
 
@@ -50,10 +49,10 @@ export default async function handler(req, res) {
                 options: pollData.options,
             });
 
-            currentPoll = pollData;
-            currentPoll._id = pollDoc._id;
+            pollData._id = pollDoc._id;
+            setCurrentPoll(pollData);
 
-            res.status(200).json({ success: true, poll: currentPoll });
+            res.status(200).json({ success: true, poll: pollData });
         } else {
             res.status(405).json({ error: 'Method not allowed' });
         }

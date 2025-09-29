@@ -1,5 +1,9 @@
-// Import the shared state from current-poll API
-// Note: In a real deployment, these would be in a shared database or Redis cache
+import { 
+    getCurrentPoll, 
+    setCurrentPoll, 
+    getAnsweredStudents, 
+    addAnsweredStudent 
+} from './shared-state.js';
 
 export default async function handler(req, res) {
     // Set CORS headers
@@ -16,23 +20,21 @@ export default async function handler(req, res) {
         if (req.method === 'POST') {
             const { answer, studentId } = req.body;
             
-            // For now, we'll need to get the current poll from the main server
-            // This is a simplified version - in production you'd use a shared database
-            try {
-                const pollResponse = await fetch(`${process.env.VERCEL_URL || 'http://localhost:5000'}/api/current-poll`);
-                const currentPoll = await pollResponse.json();
+            const currentPoll = getCurrentPoll();
+            
+            if (currentPoll && currentPoll.options && currentPoll.options[answer] && !getAnsweredStudents().has(studentId)) {
+                // Add student to answered set
+                addAnsweredStudent(studentId);
                 
-                if (currentPoll && currentPoll.options && currentPoll.options[answer]) {
-                    // Update the poll with the new answer
-                    currentPoll.options[answer].votes++;
-                    
-                    res.status(200).json({ success: true, poll: currentPoll });
-                } else {
-                    res.status(400).json({ success: false, message: 'Poll not found or invalid answer' });
-                }
-            } catch (fetchError) {
-                console.error('Error fetching current poll:', fetchError);
-                res.status(500).json({ success: false, message: 'Error processing answer' });
+                // Update the poll with the new answer
+                currentPoll.options[answer].votes++;
+                setCurrentPoll(currentPoll);
+                
+                res.status(200).json({ success: true, poll: currentPoll });
+            } else if (getAnsweredStudents().has(studentId)) {
+                res.status(400).json({ success: false, message: 'Student has already answered this poll' });
+            } else {
+                res.status(400).json({ success: false, message: 'Poll not found or invalid answer' });
             }
         } else {
             res.status(405).json({ error: 'Method not allowed' });
