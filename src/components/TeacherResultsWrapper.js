@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useSocket } from './SocketManager';
+import { usePolling } from './PollingManager';
 import TeacherLiveResults from './TeacherLiveResults';
 import TeacherPollCreation from './TeacherPollCreation';
 import '../styles/TeacherLiveResults.css';
 
 const TeacherResultsWrapper = () => {
-  const socket = useSocket();
+  const { socket, isSocketConnected } = useSocket();
+  const { createPoll } = usePolling();
   const [currentPoll, setCurrentPoll] = useState(null);
 
   // Hydrate from sessionStorage so going back from history restores results view
@@ -27,10 +29,21 @@ const TeacherResultsWrapper = () => {
     }
   }, [currentPoll]);
 
-  const handleAskQuestion = (pollData) => {
-    if (socket) {
+  const handleAskQuestion = async (pollData) => {
+    if (isSocketConnected && socket) {
+      // Use Socket.IO for local development
+      console.log("📝 Creating poll via Socket.IO");
       socket.emit('poll:create', pollData);
       setCurrentPoll(pollData);
+    } else {
+      // Use polling system for production
+      console.log("📝 Creating poll via polling system");
+      const result = await createPoll(pollData);
+      if (result.success) {
+        setCurrentPoll(result.poll);
+      } else {
+        console.error("Failed to create poll:", result.error);
+      }
     }
   };
   

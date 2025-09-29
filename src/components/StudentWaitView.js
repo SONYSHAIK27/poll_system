@@ -38,7 +38,7 @@ const StudentWaitView = () => {
   // Handle polling fallback
   useEffect(() => {
     if (connectionStatus === 'failed' || (!isSocketConnected && connectionStatus !== 'connecting')) {
-      console.log("🔄 Using polling fallback");
+      console.log("🔄 Using polling fallback for student");
       
       // Join as student using polling
       const studentName = sessionStorage.getItem('studentName') || 'Student';
