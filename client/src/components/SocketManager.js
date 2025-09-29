@@ -25,6 +25,7 @@ export const SocketManager = ({ children }) => {
     
     // ALWAYS use polling service - no Socket.IO
     console.log("🌐 Using polling service for all environments");
+    // eslint-disable-next-line no-unused-vars
     const service = new PollingService();
     setSocket(service);
     setConnectionStatus('connected');
