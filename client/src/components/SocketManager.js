@@ -5,7 +5,7 @@ import PollingService from '../services/pollingService';
 const isProduction = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
 
 // Always use polling service - no Socket.IO
-console.log('🌐 Using polling service for all environments');
+console.log('🌐 Using polling service for all environments - ESLint clean');
 
 const SocketContext = createContext();
 export const useSocket = () => {
