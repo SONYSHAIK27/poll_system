@@ -13,36 +13,126 @@ const ChatModal = ({ onClose, studentName }) => {
   const [isLoading, setIsLoading] = useState(false);
   const isTeacher = !studentName;
 
+  // Static AI Response Generation Function
+  const generateStaticAIResponse = (message, sender) => {
+    const lowerMessage = message.toLowerCase();
+    
+    // Greeting responses
+    if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey')) {
+      return `Hello ${sender}! I'm your AI assistant for the live polling system. How can I help you today?`;
+    }
+    
+    // Help requests
+    if (lowerMessage.includes('help') || lowerMessage.includes('how')) {
+      return `I can help you with various things related to the polling system:
+      
+• Ask questions about how to use the system
+• Get help with poll creation and management
+• Learn about features and functionality
+• Troubleshoot any issues you might be having
+
+What specific help do you need?`;
+    }
+    
+    // Poll-related questions
+    if (lowerMessage.includes('poll') || lowerMessage.includes('question') || lowerMessage.includes('vote')) {
+      return `Here's how the polling system works:
+
+**For Teachers:**
+• Create polls with multiple choice questions
+• Set time limits for polls
+• View live results as students vote
+• Manage student participants
+
+**For Students:**
+• Join polls using your name
+• Answer questions by selecting options
+• View live results after voting
+• Chat with the AI assistant (that's me!)
+
+Is there something specific about polls you'd like to know more about?`;
+    }
+    
+    // Technical support
+    if (lowerMessage.includes('error') || lowerMessage.includes('problem') || lowerMessage.includes('issue')) {
+      return `I'm here to help with technical issues! Here are some common solutions:
+
+• **Connection problems**: Try refreshing the page
+• **Can't see polls**: Make sure you're connected to the same session
+• **Voting issues**: Check if the poll is still active
+• **Chat problems**: Ensure your internet connection is stable
+
+Can you describe the specific issue you're experiencing?`;
+    }
+    
+    // Feature questions
+    if (lowerMessage.includes('feature') || lowerMessage.includes('what can') || lowerMessage.includes('capabilities')) {
+      return `The live polling system includes these features:
+
+🎯 **Real-time Polling**: Create and participate in live polls
+📊 **Live Results**: See results update in real-time
+👥 **Student Management**: Teachers can manage participants
+💬 **AI Assistant**: Get help and ask questions (that's me!)
+📈 **Poll History**: View past polls and results
+⏱️ **Timer Support**: Set time limits for polls
+
+What feature would you like to learn more about?`;
+    }
+    
+    // Thank you responses
+    if (lowerMessage.includes('thank') || lowerMessage.includes('thanks')) {
+      return `You're welcome! I'm always here to help. Feel free to ask me anything about the polling system or if you need assistance with anything else!`;
+    }
+    
+    // Time-related questions
+    if (lowerMessage.includes('time') || lowerMessage.includes('timer') || lowerMessage.includes('duration')) {
+      return `The polling system supports customizable timers:
+
+⏱️ **Timer Features:**
+• Teachers can set poll duration (default: 60 seconds)
+• Automatic poll closure when time expires
+• Real-time countdown display
+• Results are shown immediately after timer expires
+
+**How to set timers:**
+• When creating a poll, specify the duration in seconds
+• The system will automatically close the poll when time runs out
+• All participants will see the final results
+
+Need help with anything else about timers or polls?`;
+    }
+    
+    // Default response for unrecognized messages
+    return `I understand you're asking about "${message}". I'm an AI assistant designed to help with the live polling system. 
+
+I can help you with:
+• How to use the polling features
+• Troubleshooting issues
+• Understanding system capabilities
+• General questions about the platform
+
+Could you rephrase your question or ask about something specific I can help with?`;
+  };
+
   useEffect(() => {
     if (!socket) return;
     
-    const handleAIResponse = (response) => {
-      setIsLoading(false);
-      setMessages((prevMessages) => [...prevMessages, {
-        sender: response.sender,
-        text: response.text,
-        timestamp: response.timestamp
-      }]);
-    };
-
     const handleParticipants = (list) => {
       setParticipants(Array.isArray(list) ? list : []);
     };
 
-    socket.on('ai:response', handleAIResponse);
     socket.on('students:list', handleParticipants);
 
     // Ask server for the latest list when modal opens
     socket.emit('students:get');
     
     return () => {
-      socket.off('ai:response', handleAIResponse);
       socket.off('students:list', handleParticipants);
     };
   }, [socket]);
   
   const handleSendMessage = () => {
-    if (socket && newMessage.trim() !== '' && !isLoading) {
+    if (newMessage.trim() !== '' && !isLoading) {
       const userMessage = {
         sender: studentName || 'Teacher',
         text: newMessage,
@@ -52,12 +142,21 @@ const ChatModal = ({ onClose, studentName }) => {
       // Add user message to chat immediately
       setMessages((prevMessages) => [...prevMessages, userMessage]);
       
-      // Send AI chat request
+      // Generate static AI response
       setIsLoading(true);
-      socket.emit('ai:chat', {
-        message: newMessage,
-        sender: studentName || 'Teacher'
-      });
+      
+      // Simulate AI thinking time
+      setTimeout(() => {
+        const aiResponse = generateStaticAIResponse(newMessage, studentName || 'Teacher');
+        const aiMessage = {
+          sender: 'AI Assistant',
+          text: aiResponse,
+          timestamp: new Date().toISOString()
+        };
+        
+        setMessages((prevMessages) => [...prevMessages, aiMessage]);
+        setIsLoading(false);
+      }, 1000 + Math.random() * 1000); // Random delay between 1-2 seconds
       
       setNewMessage('');
     }
