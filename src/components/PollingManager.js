@@ -208,6 +208,12 @@ export const PollingManager = ({ children }) => {
         
         localStorage.setItem('currentPoll', JSON.stringify(poll));
         setCurrentPoll(poll);
+        
+        // Save to poll history
+        const pollHistory = JSON.parse(localStorage.getItem('pollHistory') || '[]');
+        pollHistory.unshift(poll); // Add to beginning
+        localStorage.setItem('pollHistory', JSON.stringify(pollHistory));
+        
         console.log('📝 Poll created via localStorage:', poll);
         return { success: true, poll };
       } catch (error) {
