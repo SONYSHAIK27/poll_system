@@ -2,20 +2,5 @@
   "buildCommand": "cd client && npm run build",
   "outputDirectory": "client/build",
   "installCommand": "cd client && npm install",
-  "framework": "create-react-app",
-  "functions": {
-    "server/index.js": {
-      "runtime": "nodejs18.x"
-    }
-  },
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/server/index.js"
-    },
-    {
-      "source": "/socket.io/(.*)",
-      "destination": "/server/index.js"
-    }
-  ]
+  "framework": "create-react-app"
 }
