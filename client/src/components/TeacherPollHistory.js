@@ -9,7 +9,7 @@ const TeacherPollHistory = () => {
   useEffect(() => {
     const fetchPolls = async () => {
       try {
-        const apiUrl = process.env.REACT_APP_API_URL || "https://poll-system-3a4pxp95p-sonys-projects-eca9a033.vercel.app";
+        const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
         const res = await fetch(`${apiUrl}/api/polls`);
         if (!res.ok) throw new Error("Failed to fetch polls");
         const data = await res.json();
