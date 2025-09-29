@@ -1,24 +1,51 @@
 import React, { useState, useEffect } from 'react';
 import { useSocket } from './SocketManager';
+import { usePolling } from './PollingManager';
 import { useNavigate } from 'react-router-dom';
 import '../styles/TeacherLiveResults.css';
 import ChatModal from './ChatModal';
 
 const TeacherLiveResults = ({ initialPollData, onStartNewPoll }) => {
-  const socket = useSocket();
+  const { socket, isSocketConnected } = useSocket();
+  const { currentPoll, getPollResults } = usePolling();
   const [livePollData, setLivePollData] = useState(initialPollData);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const navigate = useNavigate();
 
+  // Handle Socket.IO updates (local development)
   useEffect(() => {
-    if (!socket) return;
-    socket.on('poll:update', (updatedPoll) => {
-      setLivePollData(updatedPoll);
-    });
-    return () => {
-      socket.off('poll:update');
-    };
-  }, [socket]);
+    if (isSocketConnected && socket) {
+      console.log("📊 TeacherLiveResults using Socket.IO");
+      socket.on('poll:update', (updatedPoll) => {
+        setLivePollData(updatedPoll);
+      });
+      return () => {
+        socket.off('poll:update');
+      };
+    }
+  }, [isSocketConnected, socket]);
+
+  // Handle polling updates (production)
+  useEffect(() => {
+    if (!isSocketConnected && currentPoll) {
+      console.log("📊 TeacherLiveResults using polling - received poll update:", currentPoll);
+      setLivePollData(currentPoll);
+    }
+  }, [currentPoll, isSocketConnected]);
+
+  // Poll for updates in production
+  useEffect(() => {
+    if (!isSocketConnected) {
+      const interval = setInterval(async () => {
+        const results = await getPollResults();
+        if (results && results.poll) {
+          setLivePollData(results.poll);
+        }
+      }, 2000); // Poll every 2 seconds
+
+      return () => clearInterval(interval);
+    }
+  }, [isSocketConnected, getPollResults]);
   
   const handleToggleChat = () => {
     setIsChatOpen(!isChatOpen);

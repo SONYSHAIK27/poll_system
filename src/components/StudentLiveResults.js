@@ -1,36 +1,63 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useSocket } from './SocketManager';
+import { usePolling } from './PollingManager';
 import '../styles/TeacherLiveResults.css';
 import ChatModal from './ChatModal';
 
 const StudentLiveResults = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const socket = useSocket();
+  const { socket, isSocketConnected } = useSocket();
+  const { currentPoll, getPollResults } = usePolling();
   const { pollData, studentName } = location.state || {}; // New: get studentName
   const [livePollData, setLivePollData] = useState(pollData);
   const [isChatOpen, setIsChatOpen] = useState(false);
 
+  // Handle Socket.IO updates (local development)
   useEffect(() => {
-    if (!socket) return;
-    
-    const handlePollUpdate = (updatedPoll) => {
-      setLivePollData(updatedPoll);
-    };
+    if (isSocketConnected && socket) {
+      console.log("📊 StudentLiveResults using Socket.IO");
+      
+      const handlePollUpdate = (updatedPoll) => {
+        setLivePollData(updatedPoll);
+      };
 
-    const handleKicked = () => {
-      navigate('/kicked-out');
-    };
+      const handleKicked = () => {
+        navigate('/kicked-out');
+      };
 
-    socket.on('poll:update', handlePollUpdate);
-    socket.on('student:kicked', handleKicked);
-    
-    return () => {
-      socket.off('poll:update', handlePollUpdate);
-      socket.off('student:kicked', handleKicked);
-    };
-  }, [socket, navigate]);
+      socket.on('poll:update', handlePollUpdate);
+      socket.on('student:kicked', handleKicked);
+      
+      return () => {
+        socket.off('poll:update', handlePollUpdate);
+        socket.off('student:kicked', handleKicked);
+      };
+    }
+  }, [isSocketConnected, socket, navigate]);
+
+  // Handle polling updates (production)
+  useEffect(() => {
+    if (!isSocketConnected && currentPoll) {
+      console.log("📊 StudentLiveResults using polling - received poll update:", currentPoll);
+      setLivePollData(currentPoll);
+    }
+  }, [currentPoll, isSocketConnected]);
+
+  // Poll for updates in production
+  useEffect(() => {
+    if (!isSocketConnected) {
+      const interval = setInterval(async () => {
+        const results = await getPollResults();
+        if (results && results.poll) {
+          setLivePollData(results.poll);
+        }
+      }, 2000); // Poll every 2 seconds
+
+      return () => clearInterval(interval);
+    }
+  }, [isSocketConnected, getPollResults]);
 
   const handleToggleChat = () => {
     setIsChatOpen(!isChatOpen);

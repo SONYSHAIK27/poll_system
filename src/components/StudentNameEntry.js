@@ -1,23 +1,35 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSocket } from './SocketManager';
+import { usePolling } from './PollingManager';
 import '../styles/StudentNameEntry.css';
 
 const StudentNameEntry = () => {
   const [name, setName] = useState('');
   const navigate = useNavigate();
-  const socket = useSocket();
+  const { socket, isSocketConnected } = useSocket();
+  const { joinAsStudent } = usePolling();
 
   const handleNameChange = (event) => {
     setName(event.target.value);
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (name.trim() !== '') {
-      if (socket) {
+      const studentId = `student_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
+      if (isSocketConnected && socket) {
+        // Use Socket.IO for local development
+        console.log("👋 Student joining via Socket.IO");
         socket.emit('student:join', { name });
+      } else {
+        // Use polling system for production
+        console.log("👋 Student joining via polling");
+        await joinAsStudent(name, studentId);
       }
+      
       sessionStorage.setItem('studentName', name);
+      sessionStorage.setItem('studentId', studentId);
       navigate('/student-wait', { state: { studentName: name } });
     }
   };

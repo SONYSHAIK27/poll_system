@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useSocket } from './SocketManager';
+import { usePolling } from './PollingManager';
 import ChatModal from './ChatModal';
 import '../styles/StudentPollView.css';
 
 const StudentPollView = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const socket = useSocket();
+  const { socket, isSocketConnected } = useSocket();
+  const { currentPoll, submitAnswer } = usePolling();
   const { pollData: initialPollData } = location.state || {};
   
   const [pollData, setPollData] = useState(initialPollData);
@@ -24,53 +26,84 @@ const StudentPollView = () => {
     }
   }, [initialPollData, navigate]);
 
+  // Handle Socket.IO events (local development)
   useEffect(() => {
-    if (!socket) return;
-    
-    const handlePollUpdate = (updatedPollData) => {
-      setPollData(updatedPollData);
-    };
+    if (isSocketConnected && socket) {
+      console.log("📱 StudentPollView using Socket.IO");
+      
+      const handlePollUpdate = (updatedPollData) => {
+        setPollData(updatedPollData);
+      };
 
-    const handleTimerExpired = () => {
-      setIsTimeUp(true);
-    };
+      const handleTimerExpired = () => {
+        setIsTimeUp(true);
+      };
 
-    const handleNewPoll = (newPoll) => {
-      setPollData(newPoll);
-      setSelectedOption(null);
-      setIsTimeUp(false);
-      setTimeLeft(newPoll.pollTime || 60);
-    };
+      const handleNewPoll = (newPoll) => {
+        setPollData(newPoll);
+        setSelectedOption(null);
+        setIsTimeUp(false);
+        setTimeLeft(newPoll.pollTime || 60);
+      };
 
-    const handleKicked = () => {
-      navigate('/kicked-out');
-    };
+      const handleKicked = () => {
+        navigate('/kicked-out');
+      };
 
-    socket.on('poll:update', handlePollUpdate);
-    socket.on('question:timerExpired', handleTimerExpired);
-    socket.on('poll:question', handleNewPoll);
-    socket.on('student:kicked', handleKicked);
+      socket.on('poll:update', handlePollUpdate);
+      socket.on('question:timerExpired', handleTimerExpired);
+      socket.on('poll:question', handleNewPoll);
+      socket.on('student:kicked', handleKicked);
 
+      return () => {
+        socket.off('poll:update', handlePollUpdate);
+        socket.off('question:timerExpired', handleTimerExpired);
+        socket.off('poll:question', handleNewPoll);
+        socket.off('student:kicked', handleKicked);
+      };
+    }
+  }, [isSocketConnected, socket, navigate]);
+
+  // Handle polling updates (production)
+  useEffect(() => {
+    if (!isSocketConnected && currentPoll) {
+      console.log("📱 StudentPollView using polling - received poll update:", currentPoll);
+      setPollData(currentPoll);
+    }
+  }, [currentPoll, isSocketConnected]);
+
+  // Timer effect
+  useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft(prevTime => (prevTime > 0 ? prevTime - 1 : 0));
     }, 1000);
 
-    return () => {
-      clearInterval(timer);
-      socket.off('poll:update', handlePollUpdate);
-      socket.off('question:timerExpired', handleTimerExpired);
-      socket.off('poll:question', handleNewPoll);
-      socket.off('student:kicked', handleKicked);
-    };
-  }, [socket, navigate, initialPollData]);
+    return () => clearInterval(timer);
+  }, []);
 
-  const handleSubmit = () => {
-    if (socket && selectedOption !== null) {
+  const handleSubmit = async () => {
+    if (selectedOption !== null) {
       // Find the index of the selected option
       const selectedIndex = pollData.options.findIndex(option => option.text === selectedOption);
-      socket.emit('poll:answer', {
-        answer: selectedIndex,
-      });
+      
+      if (isSocketConnected && socket) {
+        // Use Socket.IO for local development
+        console.log("📤 Submitting answer via Socket.IO");
+        socket.emit('poll:answer', {
+          answer: selectedIndex,
+        });
+      } else {
+        // Use polling system for production
+        console.log("📤 Submitting answer via polling");
+        const studentId = sessionStorage.getItem('studentId') || `student_${Date.now()}`;
+        const result = await submitAnswer(selectedIndex, studentId);
+        if (result.success) {
+          console.log("✅ Answer submitted successfully");
+        } else {
+          console.error("❌ Failed to submit answer:", result.error);
+        }
+      }
+      
       setSelectedOption('submitted');
     }
   };
