@@ -11,23 +11,41 @@ export const PollingManager = ({ children }) => {
   const [pollingInterval, setPollingInterval] = useState(null);
 
   const API_BASE = process.env.NODE_ENV === 'production' 
-    ? window.location.origin 
+    ? null // Use localStorage for production
     : 'http://localhost:5000';
 
   // Polling function to check for new polls
   const pollForUpdates = async () => {
-    try {
-      const response = await fetch(`${API_BASE}/api/current-poll`);
-      if (response.ok) {
-        const poll = await response.json();
-        if (poll && poll.question) {
-          setCurrentPoll(poll);
-          setIsConnected(true);
+    if (API_BASE) {
+      // Local development - use real API
+      try {
+        const response = await fetch(`${API_BASE}/api/current-poll`);
+        if (response.ok) {
+          const poll = await response.json();
+          if (poll && poll.question) {
+            setCurrentPoll(poll);
+            setIsConnected(true);
+          }
         }
+      } catch (error) {
+        console.error('Polling error:', error);
+        setIsConnected(false);
       }
-    } catch (error) {
-      console.error('Polling error:', error);
-      setIsConnected(false);
+    } else {
+      // Production - use localStorage
+      try {
+        const pollData = localStorage.getItem('currentPoll');
+        if (pollData) {
+          const poll = JSON.parse(pollData);
+          if (poll && poll.question) {
+            setCurrentPoll(poll);
+            setIsConnected(true);
+          }
+        }
+      } catch (error) {
+        console.error('localStorage polling error:', error);
+        setIsConnected(false);
+      }
     }
   };
 
@@ -49,47 +67,82 @@ export const PollingManager = ({ children }) => {
 
   // Submit answer
   const submitAnswer = async (answer, studentId) => {
-    try {
-      const response = await fetch(`${API_BASE}/api/poll/answer`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ answer, studentId }),
-      });
-      
-      if (response.ok) {
-        const result = await response.json();
-        setCurrentPoll(result.poll);
-        return { success: true, poll: result.poll };
+    if (API_BASE) {
+      // Local development - use real API
+      try {
+        const response = await fetch(`${API_BASE}/api/poll/answer`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ answer, studentId }),
+        });
+        
+        if (response.ok) {
+          const result = await response.json();
+          setCurrentPoll(result.poll);
+          return { success: true, poll: result.poll };
+        }
+        return { success: false, error: 'Failed to submit answer' };
+      } catch (error) {
+        console.error('Error submitting answer:', error);
+        return { success: false, error: error.message };
       }
-      return { success: false, error: 'Failed to submit answer' };
-    } catch (error) {
-      console.error('Error submitting answer:', error);
-      return { success: false, error: error.message };
+    } else {
+      // Production - use localStorage
+      try {
+        const pollData = localStorage.getItem('currentPoll');
+        if (pollData) {
+          const poll = JSON.parse(pollData);
+          if (poll.options[answer]) {
+            poll.options[answer].votes++;
+            localStorage.setItem('currentPoll', JSON.stringify(poll));
+            setCurrentPoll(poll);
+            return { success: true, poll };
+          }
+        }
+        return { success: false, error: 'No active poll' };
+      } catch (error) {
+        console.error('Error submitting answer:', error);
+        return { success: false, error: error.message };
+      }
     }
   };
 
   // Join as student
   const joinAsStudent = async (name, studentId) => {
-    try {
-      const response = await fetch(`${API_BASE}/api/student/join`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name, studentId }),
-      });
-      
-      if (response.ok) {
+    if (API_BASE) {
+      // Local development - use real API
+      try {
+        const response = await fetch(`${API_BASE}/api/student/join`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ name, studentId }),
+        });
+        
+        if (response.ok) {
+          setIsConnected(true);
+          startPolling();
+          return { success: true };
+        }
+        return { success: false, error: 'Failed to join' };
+      } catch (error) {
+        console.error('Error joining:', error);
+        return { success: false, error: error.message };
+      }
+    } else {
+      // Production - use localStorage
+      try {
+        console.log('🎓 Student joined via localStorage:', name);
         setIsConnected(true);
         startPolling();
         return { success: true };
+      } catch (error) {
+        console.error('Error joining:', error);
+        return { success: false, error: error.message };
       }
-      return { success: false, error: 'Failed to join' };
-    } catch (error) {
-      console.error('Error joining:', error);
-      return { success: false, error: error.message };
     }
   };
 
@@ -112,24 +165,46 @@ export const PollingManager = ({ children }) => {
 
   // Create poll (teacher)
   const createPoll = async (pollData) => {
-    try {
-      const response = await fetch(`${API_BASE}/api/poll/create`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(pollData),
-      });
-      
-      if (response.ok) {
-        const result = await response.json();
-        setCurrentPoll(result.poll);
-        return { success: true, poll: result.poll };
+    if (API_BASE) {
+      // Local development - use real API
+      try {
+        const response = await fetch(`${API_BASE}/api/poll/create`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(pollData),
+        });
+        
+        if (response.ok) {
+          const result = await response.json();
+          setCurrentPoll(result.poll);
+          return { success: true, poll: result.poll };
+        }
+        return { success: false, error: 'Failed to create poll' };
+      } catch (error) {
+        console.error('Error creating poll:', error);
+        return { success: false, error: error.message };
       }
-      return { success: false, error: 'Failed to create poll' };
-    } catch (error) {
-      console.error('Error creating poll:', error);
-      return { success: false, error: error.message };
+    } else {
+      // Production - use localStorage
+      try {
+        const poll = {
+          question: pollData.question,
+          options: pollData.options.map(opt => ({ text: opt.text, votes: 0 })),
+          pollTime: pollData.pollTime || 60,
+          createdAt: new Date().toISOString(),
+          id: Date.now().toString()
+        };
+        
+        localStorage.setItem('currentPoll', JSON.stringify(poll));
+        setCurrentPoll(poll);
+        console.log('📝 Poll created via localStorage:', poll);
+        return { success: true, poll };
+      } catch (error) {
+        console.error('Error creating poll:', error);
+        return { success: false, error: error.message };
+      }
     }
   };
 
