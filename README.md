@@ -1,270 +1,70 @@
-﻿# Live Polling System
+# Getting Started with Create React App
 
-A real-time interactive polling system built with React and Node.js, designed for educational environments where teachers can create polls and students can participate in real-time.
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-##  Features
+## Available Scripts
 
-### For Teachers
-- **Create Polls**: Design custom questions with multiple choice options
-- **Timer Control**: Set poll duration (60, 120, or 180 seconds)
-- **Real-time Results**: View live voting results as students submit answers
-- **Student Management**: Monitor connected students and remove disruptive participants
-- **Poll History**: Access historical poll data and results
-- **Chat System**: Communicate with students through integrated chat
-- **Correct Answer Marking**: Mark which options are correct for educational purposes
+In the project directory, you can run:
 
-### For Students
-- **Join Sessions**: Enter with a custom name to participate
-- **Real-time Voting**: Submit answers and see live results
-- **Interactive Interface**: Clean, intuitive poll interface with timer
-- **Chat Participation**: Ask questions and communicate with teacher/peers
-- **Live Updates**: See results update in real-time as classmates vote
+### `npm start`
 
-### Technical Features
-- **Real-time Communication**: WebSocket-based live updates using Socket.IO
-- **Database Persistence**: MongoDB integration for poll history
-- **Responsive Design**: Modern UI that works on desktop and mobile
-- **Session Management**: Persistent student sessions with name storage
-- **Auto-timer**: Automatic poll expiration and result display
-- **Helper Bot**: AI-powered chat assistance for common questions
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-##  Technology Stack
+The page will reload when you make changes.\
+You may also see any lint errors in the console.
 
-### Frontend
-- **React 19.1.1** - Modern React with hooks
-- **React Router DOM 7.9.3** - Client-side routing
-- **Socket.IO Client 4.8.1** - Real-time communication
-- **CSS3** - Custom styling with modern design
+### `npm test`
 
-### Backend
-- **Node.js** - Server runtime
-- **Express 5.1.0** - Web framework
-- **Socket.IO 4.8.1** - Real-time bidirectional communication
-- **MongoDB** - Database for poll persistence
-- **Mongoose 8.18.2** - MongoDB object modeling
-- **CORS 2.8.5** - Cross-origin resource sharing
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-##  Project Structure
+### `npm run build`
 
-`
-live-polling-system/
- client/                 # React frontend
-    public/            # Static assets
-    src/
-       components/    # React components
-          ChatModal.js
-          KickedOutView.js
-          RoleSelection.js
-          SocketManager.js
-          StudentLiveResults.js
-          StudentNameEntry.js
-          StudentPollView.js
-          StudentView.js
-          StudentWaitView.js
-          TeacherLiveResults.js
-          TeacherPollCreation.js
-          TeacherPollHistory.js
-          TeacherResultsWrapper.js
-       styles/        # CSS stylesheets
-       index.js       # App entry point
-    package.json
- server/                # Node.js backend
-    models/
-       Poll.js        # MongoDB poll schema
-    index.js           # Server entry point
-    package.json
- README.md
-`
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
 
-##  Getting Started
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
 
-### Prerequisites
-- Node.js (v14 or higher)
-- MongoDB Atlas account (or local MongoDB)
-- Git
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### Installation
+### `npm run eject`
 
-1. **Clone the repository**
-   `ash
-   git clone https://github.com/SONYSHAIK27/poll_system.git
-   cd poll_system
-   `
+**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-2. **Install server dependencies**
-   `ash
-   cd server
-   npm install
-   `
+If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-3. **Install client dependencies**
-   `ash
-   cd ../client
-   npm install
-   `
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
 
-4. **Configure MongoDB**
-   - Update the MongoDB connection string in server/index.js
-   - Replace the connection string with your MongoDB Atlas credentials
+You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
-5. **Start the application**
+## Learn More
 
-   **Terminal 1 - Start the server:**
-   `ash
-   cd server
-   npm start
-   `
-   Server will run on http://localhost:5000
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-   **Terminal 2 - Start the client:**
-   `ash
-   cd client
-   npm start
-   `
-   Client will run on http://localhost:3000
+To learn React, check out the [React documentation](https://reactjs.org/).
 
-##  Usage Guide
+### Code Splitting
 
-### For Teachers
+This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
 
-1. **Access the System**
-   - Open http://localhost:3000
-   - Select "I'm a Teacher"
-   - You'll be taken to the poll creation interface
+### Analyzing the Bundle Size
 
-2. **Create a Poll**
-   - Set the time limit (60, 120, or 180 seconds)
-   - Enter your question
-   - Add multiple choice options
-   - Mark correct answers (optional)
-   - Click "Ask Question"
+This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
 
-3. **Monitor Results**
-   - View real-time voting results
-   - See student participation
-   - Access chat for student questions
-   - Remove disruptive students if needed
+### Making a Progressive Web App
 
-4. **View History**
-   - Click "View Poll History" to see past polls
-   - Review previous questions and results
+This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
 
-### For Students
+### Advanced Configuration
 
-1. **Join a Session**
-   - Open http://localhost:3000
-   - Select "I'm a Student"
-   - Enter your name
-   - Wait for the teacher to start a poll
+This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
 
-2. **Participate in Polls**
-   - Answer questions when they appear
-   - View live results after submitting
-   - Use chat to ask questions
-   - Wait for the next question
+### Deployment
 
-##  API Endpoints
+This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
 
-### REST API
-- GET / - Health check
-- GET /api/polls - Retrieve poll history
+### `npm run build` fails to minify
 
-### Socket.IO Events
-
-#### Client to Server
-- student:join - Student joins with name
-- poll:create - Teacher creates new poll
-- poll:answer - Student submits answer
-- chat:message - Send chat message
-- student:kick - Teacher removes student
-- students:get - Request student list
-
-#### Server to Client
-- poll:question - New poll available
-- poll:update - Live poll results update
-- question:timerExpired - Poll timer expired
-- students:list - Updated student list
-- chat:message - New chat message
-- student:kicked - Student removed notification
-
-##  UI Components
-
-### Core Components
-- **RoleSelection**: Initial role selection (Teacher/Student)
-- **TeacherPollCreation**: Poll creation interface
-- **TeacherLiveResults**: Real-time results display
-- **StudentPollView**: Student voting interface
-- **StudentWaitView**: Waiting room for students
-- **ChatModal**: Integrated chat system
-- **SocketManager**: WebSocket connection management
-
-### Styling
-- Modern, responsive design
-- Clean typography and spacing
-- Interactive elements with hover effects
-- Mobile-friendly interface
-- Consistent color scheme
-
-##  Security Features
-
-- **CORS Configuration**: Proper cross-origin setup
-- **Input Validation**: Client and server-side validation
-- **Session Management**: Secure student session handling
-- **Rate Limiting**: Built-in Socket.IO rate limiting
-- **Error Handling**: Comprehensive error management
-
-##  Deployment
-
-### Environment Variables
-Create a .env file in the server directory:
-`
-PORT=5000
-MONGODB_URI=your_mongodb_connection_string
-`
-
-### Production Build
-`ash
-# Build client for production
-cd client
-npm run build
-
-# Start server in production
-cd ../server
-npm start
-`
-
-##  Contributing
-
-1. Fork the repository
-2. Create a feature branch (git checkout -b feature/amazing-feature)
-3. Commit your changes (git commit -m 'Add some amazing feature')
-4. Push to the branch (git push origin feature/amazing-feature)
-5. Open a Pull Request
-
-##  License
-
-This project is licensed under the ISC License - see the [LICENSE](LICENSE) file for details.
-
-##  Author
-
-**Sony Shaik**
-- GitHub: [@SONYSHAIK27](https://github.com/SONYSHAIK27)
-- Repository: [poll_system](https://github.com/SONYSHAIK27/poll_system)
-
-##  Acknowledgments
-
-- Socket.IO for real-time communication
-- React team for the amazing framework
-- MongoDB for database services
-- Express.js for the web framework
-
-##  Support
-
-If you encounter any issues or have questions, please:
-1. Check the existing issues on GitHub
-2. Create a new issue with detailed information
-3. Contact the maintainer
-
----
-
-**Happy Polling! **
+This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)

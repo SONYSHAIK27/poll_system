@@ -1,0 +1,232 @@
+.teacher-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh; /* Ensure it takes full viewport height */
+  padding: 2rem 0; /* Add some space at the top and bottom */
+  box-sizing: border-box; /* Include padding in the element's total width and height */
+}
+
+.teacher-header {
+  margin-bottom: 2rem;
+}
+
+.poll-form-card {
+  background-color: white;
+  color: var(--dark-bg);
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 550px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-header label {
+  font-size: 0.9rem;
+  color: var(--gray);
+}
+
+.form-header select {
+  border: 1px solid var(--gray);
+  border-radius: 5px;
+  padding: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--gray);
+  border-radius: 5px;
+  font-size: 1rem;
+  resize: none; /* Disable manual resizing */
+  box-sizing: border-box;
+  overflow: hidden; /* Hide the default scroll bar */
+  min-height: 50px; /* Set a minimum height */
+}
+
+/* This is the key change to add a conditional scroll bar to the options list */
+.options-list-container {
+  max-height: 200px; /* Set a max height for the options container */
+  overflow-y: auto;  /* Add a vertical scroll bar only if content overflows */
+  margin-bottom: 1.5rem;
+}
+
+.option-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+  position: relative;
+}
+
+.option-row input[type="text"] {
+  flex-grow: 1;
+  padding: 0.75rem;
+  border: 1px solid var(--gray);
+  border-radius: 5px;
+}
+
+.correct-answer-select {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.radio-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.add-option-button {
+  background: none;
+  border: none;
+  color: var(--purple-light);
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 0.5rem;
+}
+
+.ask-question-button {
+  padding: 1rem 3rem;
+  font-size: 1rem;
+  font-weight: bold;
+  color: white;
+  border: none;
+  border-radius: 30px;
+  background: linear-gradient(135deg, var(--purple-light), var(--blue));
+  cursor: pointer;
+  display: block;
+  margin-left: auto;
+  margin-top: 2rem;
+}
+
+.teacher-header {
+  margin-bottom: 2rem;
+}
+
+.poll-form-card {
+  background-color: white;
+  color: var(--dark-bg);
+  padding: 2rem; /* Adjusted padding */
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 550px; /* Decreased max-width to make it smaller */
+  text-align: left;
+}
+
+.form-header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-header label {
+  font-size: 0.9rem;
+  color: var(--gray);
+}
+
+.form-header select {
+  border: 1px solid var(--gray);
+  border-radius: 5px;
+  padding: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--gray);
+  border-radius: 5px;
+  font-size: 1rem;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.option-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+  position: relative;
+}
+
+.option-row input[type="text"] {
+  flex-grow: 1;
+  padding: 0.75rem;
+  border: 1px solid var(--gray);
+  border-radius: 5px;
+}
+
+.correct-answer-select {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.radio-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.add-option-button {
+  background: none;
+  border: none;
+  color: var(--purple-light);
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 0.5rem;
+}
+
+.ask-question-button {
+  padding: 1rem 3rem;
+  font-size: 1rem;
+  font-weight: bold;
+  color: white;
+  border: none;
+  border-radius: 30px;
+  background: linear-gradient(135deg, var(--purple-light), var(--blue));
+  cursor: pointer;
+  display: block;
+  margin-left: auto;
+  margin-top: 2rem;
+}
