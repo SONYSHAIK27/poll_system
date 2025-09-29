@@ -181,7 +181,24 @@ class PollingService {
         
         // Handle specific events
         if (event === 'student:join') {
-            this.joinStudent(data.name, this.generateStudentId());
+            // For student:join, we need to handle it synchronously for the UI
+            const studentId = this.generateStudentId();
+            sessionStorage.setItem('studentId', studentId);
+            sessionStorage.setItem('studentName', data.name);
+            
+            // Emit the joined event immediately using the event system
+            if (this.listeners.has('student:joined')) {
+                this.listeners.get('student:joined').forEach(callback => {
+                    try {
+                        callback({ studentId, name: data.name });
+                    } catch (error) {
+                        console.error('Error in student:joined callback:', error);
+                    }
+                });
+            }
+            
+            // Also call the async method in background
+            this.joinStudent(data.name, studentId);
         } else if (event === 'teacher:join') {
             this.getStudents();
         } else if (event === 'poll:create') {
