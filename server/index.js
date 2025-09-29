@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 const cors = require('cors');
@@ -7,16 +7,25 @@ const Poll = require('./models/Poll');
 
 const app = express();
 const server = http.createServer(app);
+
+// Configure CORS for Vercel deployment
+const corsOptions = {
+  origin: [
+    "http://localhost:3000",
+    "https://poll-system-*.vercel.app",
+    "https://*.vercel.app"
+  ],
+  methods: ["GET", "POST"],
+  credentials: true
+};
+
 const io = socketIo(server, {
-  cors: {
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST"]
-  }
+  cors: corsOptions
 });
 
 const PORT = process.env.PORT || 5000;
 
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Root API route (optional health check)
@@ -25,7 +34,7 @@ app.get('/', (req, res) => {
 });
 
 // Connect to MongoDB Atlas
-mongoose.connect('mongodb+srv://sonyshaik027:S0ny027%40@cluster0.zitqgzq.mongodb.net/livepolling?retryWrites=true&w=majority&appName=Cluster0', {
+mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://sonyshaik027:S0ny027%40@cluster0.zitqgzq.mongodb.net/livepolling?retryWrites=true&w=majority&appName=Cluster0', {
     serverSelectionTimeoutMS: 20000 
 })
 .then(() => {
@@ -174,3 +183,6 @@ mongoose.connect('mongodb+srv://sonyshaik027:S0ny027%40@cluster0.zitqgzq.mongodb
     console.error('Database connection failed:', err);
     process.exit(1);
 });
+
+// Export for Vercel
+module.exports = app;
