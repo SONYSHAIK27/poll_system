@@ -6,7 +6,7 @@ const ChatModal = ({ onClose, studentName }) => {
   const socket = useSocket();
   const [activeTab, setActiveTab] = useState('chat');
   const [messages, setMessages] = useState([
-    { sender: 'AI Assistant', text: 'Hi! How can I help you today? I\'m your AI assistant for the live polling system. You can ask me questions about how to use the system, get help with features, or troubleshoot any issues. (Updated v2.0)' }
+    { sender: 'AI Assistant', text: '🤖 AI CHAT IS WORKING! Hi! How can I help you today? I\'m your AI assistant for the live polling system. You can ask me questions about how to use the system, get help with features, or troubleshoot any issues. (Updated v3.0 - Static Responses Active!)' }
   ]);
   const [newMessage, setNewMessage] = useState('');
   const [participants, setParticipants] = useState([]);
@@ -245,13 +245,14 @@ Could you rephrase your question or ask about something specific I can help with
                     background: '#28a745',
                     color: 'white',
                     border: 'none',
-                    padding: '5px 10px',
+                    padding: '8px 15px',
                     borderRadius: '5px',
                     cursor: 'pointer',
-                    fontSize: '12px'
+                    fontSize: '14px',
+                    fontWeight: 'bold'
                   }}
                 >
-                  Test AI Response
+                  🧪 TEST AI RESPONSE
                 </button>
               </div>
             </div>
