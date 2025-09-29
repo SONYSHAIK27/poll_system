@@ -4,7 +4,18 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
-const Poll = require('../server/models/Poll');
+
+// Define Poll schema inline for Vercel deployment
+const pollSchema = new mongoose.Schema({
+  question: { type: String, required: true },
+  options: [{
+    text: { type: String, required: true },
+    votes: { type: Number, default: 0 }
+  }],
+  createdAt: { type: Date, default: Date.now }
+});
+
+const Poll = mongoose.model('Poll', pollSchema);
 
 const app = express();
 
