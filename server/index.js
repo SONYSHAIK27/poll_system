@@ -29,11 +29,13 @@ const corsOptions = {
       return callback(null, true);
     }
     
-    callback(null, true); // Allow all origins for now
+    // Allow all origins for now (more permissive for debugging)
+    callback(null, true);
   },
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true,
-  allowedHeaders: ["Content-Type", "Authorization"]
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+  optionsSuccessStatus: 200 // For legacy browser support
 };
 
 const io = socketIo(server, {

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { createMockIO } from '../utils/socketMock';
 
 // Only import Socket.IO in development
 let io = null;
@@ -6,8 +7,12 @@ if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
   try {
     io = require('socket.io-client');
   } catch (e) {
-    console.log('Socket.IO not available');
+    console.log('Socket.IO not available, using mock');
+    io = createMockIO();
   }
+} else {
+  // Production - use mock
+  io = createMockIO();
 }
 
 const SocketContext = createContext();
@@ -29,15 +34,16 @@ export const SocketManager = ({ children }) => {
       ioAvailable: !!io
     });
     
-    if (isProduction || !io) {
-      // Production mode or Socket.IO not available - use localStorage fallback
-      console.log("🌐 Production mode - using localStorage fallback (Socket.IO disabled)");
+    if (isProduction) {
+      // Production mode - use mock socket and localStorage fallback
+      console.log("🌐 Production mode - using mock socket and localStorage fallback");
+      const mockSocket = io('mock-url');
+      setSocket(mockSocket);
       setConnectionStatus('failed'); // This will trigger polling fallback
-      setSocket(null); // Ensure no socket is set
       return;
     }
     
-    // Development mode - try Socket.IO
+    // Development mode - try real Socket.IO
     const serverUrl = "http://localhost:5000";
     console.log("🔌 Development mode - attempting to connect to:", serverUrl);
     
