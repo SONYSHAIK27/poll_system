@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import '../styles/TeacherLiveResults.css';
 
 const TeacherPollHistory = () => {
@@ -9,7 +9,8 @@ const TeacherPollHistory = () => {
   useEffect(() => {
     const fetchPolls = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/polls');
+        const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+        const res = await fetch(`${apiUrl}/api/polls`);
         if (!res.ok) throw new Error('Failed to fetch polls');
         const data = await res.json();
         setPolls(data);
@@ -67,4 +68,4 @@ const TeacherPollHistory = () => {
   );
 };
 
-export default TeacherPollHistory; 
+export default TeacherPollHistory;

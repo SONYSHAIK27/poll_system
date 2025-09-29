@@ -1,7 +1,8 @@
-﻿import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import io from 'socket.io-client';
 
 const SocketContext = createContext();
+const newSocket = io('http://localhost:5000');
 export const useSocket = () => {
   return useContext(SocketContext);
 };
@@ -10,8 +11,7 @@ export const SocketManager = ({ children }) => {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const serverUrl = process.env.REACT_APP_SERVER_URL || 'http://localhost:5000';
-    const newSocket = io(serverUrl);
+    const newSocket = io('http://localhost:5000'); // Connect to our backend server
     setSocket(newSocket);
 
     newSocket.on('connect', () => {
