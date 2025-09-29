@@ -3,10 +3,9 @@ const http = require('http');
 const socketIo = require('socket.io');
 const cors = require('cors');
 const mongoose = require('mongoose');
-const Poll = require('./models/Poll');
+const Poll = require('../server/models/Poll');
 
 const app = express();
-const server = http.createServer(app);
 
 // Configure CORS for Vercel deployment
 const corsOptions = {
@@ -35,14 +34,6 @@ const corsOptions = {
   credentials: true,
   allowedHeaders: ["Content-Type", "Authorization"]
 };
-
-const io = socketIo(server, {
-  cors: corsOptions,
-  allowEIO3: true,
-  transports: ['polling', 'websocket']
-});
-
-const PORT = process.env.PORT || 5000;
 
 app.use(cors(corsOptions));
 app.use(express.json());
@@ -202,6 +193,14 @@ Could you rephrase your question or ask about something specific I can help with
         }
     });
 
+    // Create HTTP server and Socket.IO instance
+    const server = http.createServer(app);
+    const io = socketIo(server, {
+        cors: corsOptions,
+        allowEIO3: true,
+        transports: ['polling', 'websocket']
+    });
+
     io.on('connection', (socket) => {
         console.log('A new client connected:', socket.id);
 
@@ -330,14 +329,10 @@ Could you rephrase your question or ask about something specific I can help with
     });
     });
 
-    server.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`);
-    });
+    // Export the app for Vercel
+    module.exports = app;
 })
 .catch((error) => {
     console.error('MongoDB connection error:', error);
     process.exit(1);
 });
-
-module.exports = app;
-
