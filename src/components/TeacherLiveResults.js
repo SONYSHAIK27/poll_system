@@ -8,7 +8,6 @@ const TeacherLiveResults = ({ initialPollData, onStartNewPoll }) => {
   const socket = useSocket();
   const [livePollData, setLivePollData] = useState(initialPollData);
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [students, setStudents] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -16,12 +15,8 @@ const TeacherLiveResults = ({ initialPollData, onStartNewPoll }) => {
     socket.on('poll:update', (updatedPoll) => {
       setLivePollData(updatedPoll);
     });
-    socket.on('students:list', (list) => {
-      setStudents(list || []);
-    });
     return () => {
       socket.off('poll:update');
-      socket.off('students:list');
     };
   }, [socket]);
   
@@ -33,9 +28,7 @@ const TeacherLiveResults = ({ initialPollData, onStartNewPoll }) => {
     navigate('/teacher/history');
   };
 
-  const kickStudent = (id) => {
-    if (socket) socket.emit('student:kick', id);
-  };
+  // Student management now handled in ChatModal participants tab
     
   if (!livePollData) {
     return (
@@ -85,19 +78,7 @@ const TeacherLiveResults = ({ initialPollData, onStartNewPoll }) => {
         </button>
       </div>
 
-      {students && students.length > 0 && (
-        <div className="students-panel">
-          <h4>Students</h4>
-          <ul>
-            {students.map((s) => (
-              <li key={s.id}>
-                <span>{s.name}</span>
-                <button onClick={() => kickStudent(s.id)}>Remove</button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      {/* Students panel removed - now using ChatModal participants tab for better UX */}
       
       <div className="chat-icon" onClick={handleToggleChat}>💬</div>
       {isChatOpen && <ChatModal onClose={handleToggleChat} />}
