@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { useSocket } from './SocketManager';
+
 import '../styles/TeacherPollCreation.css';
 
 const TeacherPollCreation = ({ onAskQuestion }) => {
-  const socket = useSocket();
+  
   const [question, setQuestion] = useState('');
   const [options, setOptions] = useState([{ text: '', isCorrect: false }]);
   const [pollTime, setPollTime] = useState(60);
