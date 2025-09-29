@@ -11,13 +11,23 @@ export const SocketManager = ({ children }) => {
   const [connectionStatus, setConnectionStatus] = useState('connecting'); // 'connecting', 'connected', 'failed'
 
   useEffect(() => {
-    // Check if we're in production mode
-    const isProduction = process.env.NODE_ENV === 'production';
+    // Check if we're in production mode - use multiple detection methods
+    const isProduction = process.env.NODE_ENV === 'production' || 
+                        window.location.hostname.includes('vercel.app') ||
+                        window.location.hostname.includes('netlify.app') ||
+                        window.location.hostname !== 'localhost';
+    
+    console.log("🔍 Environment check:", {
+      NODE_ENV: process.env.NODE_ENV,
+      hostname: window.location.hostname,
+      isProduction: isProduction
+    });
     
     if (isProduction) {
       // Production mode - immediately use localStorage fallback
-      console.log("🌐 Production mode - using localStorage fallback (no Socket.IO)");
+      console.log("🌐 Production mode detected - using localStorage fallback (no Socket.IO)");
       setConnectionStatus('failed'); // This will trigger polling fallback
+      setSocket(null); // Ensure no socket is set
       return;
     }
     
