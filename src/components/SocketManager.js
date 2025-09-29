@@ -9,7 +9,8 @@ console.log('🌐 Using polling service for all environments');
 
 const SocketContext = createContext();
 export const useSocket = () => {
-  return useContext(SocketContext);
+  const context = useContext(SocketContext);
+  return context?.socket || null;
 };
 
 export const SocketManager = ({ children }) => {
