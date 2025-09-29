@@ -6,42 +6,59 @@ const ChatModal = ({ onClose, studentName }) => {
   const socket = useSocket();
   const [activeTab, setActiveTab] = useState('chat');
   const [messages, setMessages] = useState([
-    { sender: 'Helper Bot', text: 'Hi! How can I help you?' }
+    { sender: 'AI Assistant', text: 'Hi! How can I help you today? I\'m your AI assistant for the live polling system. You can ask me questions about how to use the system, get help with features, or troubleshoot any issues.' }
   ]);
   const [newMessage, setNewMessage] = useState('');
   const [participants, setParticipants] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const isTeacher = !studentName;
 
   useEffect(() => {
     if (!socket) return;
     
-    const handleIncoming = (message) => {
-      setMessages((prevMessages) => [...prevMessages, message]);
+    const handleAIResponse = (response) => {
+      setIsLoading(false);
+      setMessages((prevMessages) => [...prevMessages, {
+        sender: response.sender,
+        text: response.text,
+        timestamp: response.timestamp
+      }]);
     };
 
     const handleParticipants = (list) => {
       setParticipants(Array.isArray(list) ? list : []);
     };
 
-    socket.on('chat:message', handleIncoming);
+    socket.on('ai:response', handleAIResponse);
     socket.on('students:list', handleParticipants);
 
     // Ask server for the latest list when modal opens
     socket.emit('students:get');
     
     return () => {
-      socket.off('chat:message', handleIncoming);
+      socket.off('ai:response', handleAIResponse);
       socket.off('students:list', handleParticipants);
     };
   }, [socket]);
   
   const handleSendMessage = () => {
-    if (socket && newMessage.trim() !== '') {
-      const message = {
+    if (socket && newMessage.trim() !== '' && !isLoading) {
+      const userMessage = {
         sender: studentName || 'Teacher',
         text: newMessage,
+        timestamp: new Date().toISOString()
       };
-      socket.emit('chat:message', message);
+      
+      // Add user message to chat immediately
+      setMessages((prevMessages) => [...prevMessages, userMessage]);
+      
+      // Send AI chat request
+      setIsLoading(true);
+      socket.emit('ai:chat', {
+        message: newMessage,
+        sender: studentName || 'Teacher'
+      });
+      
       setNewMessage('');
     }
   };
@@ -68,7 +85,7 @@ const ChatModal = ({ onClose, studentName }) => {
               className={`tab-button ${activeTab === 'chat' ? 'active' : ''}`}
               onClick={() => switchTab('chat')}
             >
-              Chat
+              AI Assistant
             </button>
             <button
               className={`tab-button ${activeTab === 'participants' ? 'active' : ''}`}
@@ -98,13 +115,18 @@ const ChatModal = ({ onClose, studentName }) => {
               <div className="chat-input-container">
                 <input
                   type="text"
-                  placeholder="Type a message..."
+                  placeholder={isLoading ? "AI is thinking..." : "Ask me anything about the polling system..."}
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                  disabled={isLoading}
                 />
-                <button className="send-button" onClick={handleSendMessage}>
-                  Send
+                <button 
+                  className="send-button" 
+                  onClick={handleSendMessage}
+                  disabled={isLoading || newMessage.trim() === ''}
+                >
+                  {isLoading ? '⏳' : 'Send'}
                 </button>
               </div>
             </div>

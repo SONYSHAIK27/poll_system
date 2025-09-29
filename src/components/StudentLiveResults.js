@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useSocket } from './SocketManager';
 import '../styles/TeacherLiveResults.css';
 import ChatModal from './ChatModal';
 
 const StudentLiveResults = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const socket = useSocket();
   const { pollData, studentName } = location.state || {}; // New: get studentName
   const [livePollData, setLivePollData] = useState(pollData);
@@ -13,13 +14,23 @@ const StudentLiveResults = () => {
 
   useEffect(() => {
     if (!socket) return;
-    socket.on('poll:update', (updatedPoll) => {
+    
+    const handlePollUpdate = (updatedPoll) => {
       setLivePollData(updatedPoll);
-    });
-    return () => {
-      socket.off('poll:update');
     };
-  }, [socket]);
+
+    const handleKicked = () => {
+      navigate('/kicked-out');
+    };
+
+    socket.on('poll:update', handlePollUpdate);
+    socket.on('student:kicked', handleKicked);
+    
+    return () => {
+      socket.off('poll:update', handlePollUpdate);
+      socket.off('student:kicked', handleKicked);
+    };
+  }, [socket, navigate]);
 
   const handleToggleChat = () => {
     setIsChatOpen(!isChatOpen);
