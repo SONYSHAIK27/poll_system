@@ -66,8 +66,10 @@ const StudentPollView = () => {
 
   const handleSubmit = () => {
     if (socket && selectedOption !== null) {
+      // Find the index of the selected option
+      const selectedIndex = pollData.options.findIndex(option => option.text === selectedOption);
       socket.emit('poll:answer', {
-        answer: selectedOption,
+        answer: selectedIndex,
       });
       setSelectedOption('submitted');
     }
