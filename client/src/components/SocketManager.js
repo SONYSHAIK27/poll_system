@@ -12,9 +12,7 @@ export const SocketManager = ({ children }) => {
   useEffect(() => {
     const serverUrl = "http://localhost:5000";
     const newSocket = io(serverUrl, {
-      transports: ['polling'],
-      upgrade: true,
-      rememberupgrade: true,
+      transports: ['polling', 'websocket'],
       timeout: 20000,
       forceNew: true
     });
