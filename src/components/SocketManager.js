@@ -1,17 +1,24 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { createMockIO } from '../utils/socketMock';
 
+// Check if we're in production before importing Socket.IO
+const isProduction = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
+
 // Only import Socket.IO in development
 let io = null;
-if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+if (!isProduction) {
   try {
-    io = require('socket.io-client');
+    // Try to dynamically import Socket.IO
+    const socketIO = require('socket.io-client');
+    io = socketIO;
+    console.log('🔌 Socket.IO loaded for development');
   } catch (e) {
     console.log('Socket.IO not available, using mock');
     io = createMockIO();
   }
 } else {
-  // Production - use mock
+  // Production - use mock only
+  console.log('🌐 Production mode - using mock Socket.IO');
   io = createMockIO();
 }
 
@@ -25,9 +32,6 @@ export const SocketManager = ({ children }) => {
   const [connectionStatus, setConnectionStatus] = useState('connecting'); // 'connecting', 'connected', 'failed'
 
   useEffect(() => {
-    // Check if we're in production mode
-    const isProduction = window.location.hostname !== 'localhost';
-    
     console.log("🔍 Environment check:", {
       hostname: window.location.hostname,
       isProduction: isProduction,
