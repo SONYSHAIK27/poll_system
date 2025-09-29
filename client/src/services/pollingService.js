@@ -114,6 +114,10 @@ class PollingService {
     // Join as student
     async joinStudent(name, studentId) {
         try {
+            // Store student ID in session storage
+            sessionStorage.setItem('studentId', studentId);
+            sessionStorage.setItem('studentName', name);
+            
             const response = await fetch(`${this.baseUrl}/api/students`, {
                 method: 'POST',
                 headers: {
@@ -124,6 +128,7 @@ class PollingService {
             
             if (response.ok) {
                 const result = await response.json();
+                // Emit the event that components expect
                 this.emit('student:joined', result);
                 return result;
             }
@@ -170,7 +175,32 @@ class PollingService {
         return null;
     }
 
-    // Event system
+    // Socket.IO compatible methods
+    emit(event, data) {
+        console.log(`📤 Emitting event: ${event}`, data);
+        
+        // Handle specific events
+        if (event === 'student:join') {
+            this.joinStudent(data.name, this.generateStudentId());
+        } else if (event === 'teacher:join') {
+            this.getStudents();
+        } else if (event === 'poll:create') {
+            this.createPoll(data);
+        } else if (event === 'poll:answer') {
+            this.submitAnswer(data.answer, this.getCurrentStudentId());
+        } else if (event === 'student:kick') {
+            this.removeStudent(data);
+        } else if (event === 'students:get') {
+            this.getStudents();
+        } else if (event === 'chat:message') {
+            // Handle chat messages if needed
+            console.log('Chat message:', data);
+        } else if (event === 'ai:chat') {
+            // Handle AI chat if needed
+            console.log('AI chat:', data);
+        }
+    }
+
     on(event, callback) {
         if (!this.listeners.has(event)) {
             this.listeners.set(event, []);
@@ -188,16 +218,13 @@ class PollingService {
         }
     }
 
-    emit(event, data) {
-        if (this.listeners.has(event)) {
-            this.listeners.get(event).forEach(callback => {
-                try {
-                    callback(data);
-                } catch (error) {
-                    console.error('Error in event callback:', error);
-                }
-            });
-        }
+    // Helper methods
+    generateStudentId() {
+        return 'student_' + Math.random().toString(36).substr(2, 9);
+    }
+
+    getCurrentStudentId() {
+        return sessionStorage.getItem('studentId') || this.generateStudentId();
     }
 
     // Disconnect (cleanup)
