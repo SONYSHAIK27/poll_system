@@ -1,23 +1,25 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { createMockIO } from '../utils/socketMock';
 import PollingService from '../services/pollingService';
 
-// Only import Socket.IO in development
+// Check if we're in production
+const isProduction = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
+
+// Only try to load Socket.IO in development
 let io = null;
-if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+if (!isProduction) {
   try {
-    // Try to dynamically import Socket.IO
+    // Try to dynamically import Socket.IO only in development
     const socketIO = require('socket.io-client');
     io = socketIO;
     console.log('🔌 Socket.IO loaded for development');
   } catch (e) {
-    console.log('Socket.IO not available, using mock');
-    io = createMockIO();
+    console.log('Socket.IO not available in development, will use polling');
+    io = null;
   }
 } else {
-  // Production - use mock to prevent Socket.IO from loading
-  console.log('🌐 Production mode - Socket.IO disabled');
-  io = createMockIO();
+  // Production - never load Socket.IO
+  console.log('🌐 Production mode - Socket.IO completely disabled');
+  io = null;
 }
 
 const SocketContext = createContext();
@@ -31,21 +33,18 @@ export const SocketManager = ({ children }) => {
   const [pollingService, setPollingService] = useState(null);
 
   useEffect(() => {
-    // Check if we're in production mode
-    const isProduction = window.location.hostname !== 'localhost';
-    
     console.log("🔍 Environment check:", {
       hostname: window.location.hostname,
       isProduction: isProduction,
       ioAvailable: !!io
     });
     
-    // For production, ALWAYS use polling service (never Socket.IO)
+    // ALWAYS use polling service in production
     if (isProduction) {
       console.log("🌐 Production mode - using polling service for Vercel");
       const service = new PollingService();
       setPollingService(service);
-      setSocket(service); // Use polling service as socket replacement
+      setSocket(service);
       setConnectionStatus('connected');
       service.startPolling();
       return () => {
@@ -53,7 +52,7 @@ export const SocketManager = ({ children }) => {
       };
     }
     
-    // Development mode - try Socket.IO first, fallback to polling
+    // Development mode - try Socket.IO if available, otherwise use polling
     if (io && typeof io === 'function') {
       console.log("🔌 Development mode - attempting Socket.IO connection");
       const serverUrl = "http://localhost:5000";
@@ -68,33 +67,29 @@ export const SocketManager = ({ children }) => {
       setSocket(newSocket);
 
       const connectionTimeout = setTimeout(() => {
-        if (connectionStatus === 'connecting') {
-          console.log("⏰ Socket.IO connection timeout - switching to polling fallback");
-          setConnectionStatus('failed');
-          // Switch to polling service
-          const service = new PollingService();
-          setPollingService(service);
-          setSocket(service);
-          setConnectionStatus('connected');
-          service.startPolling();
-        }
+        console.log("⏰ Socket.IO connection timeout - switching to polling");
+        setConnectionStatus('failed');
+        // Switch to polling service
+        const service = new PollingService();
+        setPollingService(service);
+        setSocket(service);
+        setConnectionStatus('connected');
+        service.startPolling();
       }, 15000);
 
       newSocket.on("connect", () => {
-        console.log("✅ Successfully connected to the backend server via Socket.IO!");
-        console.log("Socket ID:", newSocket.id);
+        console.log("✅ Successfully connected via Socket.IO!");
         setConnectionStatus('connected');
         clearTimeout(connectionTimeout);
       });
 
       newSocket.on("disconnect", (reason) => {
-        console.log("❌ Disconnected from the server. Reason:", reason);
+        console.log("❌ Socket.IO disconnected:", reason);
         setConnectionStatus('failed');
       });
 
       newSocket.on("connect_error", (error) => {
         console.error("❌ Socket.IO connection error:", error);
-        console.error("Error details:", error.message);
         setConnectionStatus('failed');
         clearTimeout(connectionTimeout);
         // Switch to polling service on error
@@ -106,13 +101,12 @@ export const SocketManager = ({ children }) => {
       });
 
       return () => {
-        console.log("🧹 Cleaning up socket connection");
         clearTimeout(connectionTimeout);
         newSocket.disconnect();
       };
     } else {
-      // Socket.IO not available in development - use polling
-      console.log("🌐 Socket.IO not available in development - using polling service");
+      // Socket.IO not available - use polling
+      console.log("🌐 Using polling service (Socket.IO not available)");
       const service = new PollingService();
       setPollingService(service);
       setSocket(service);
