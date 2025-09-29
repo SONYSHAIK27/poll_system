@@ -130,8 +130,12 @@ Could you rephrase your question or ask about something specific I can help with
       socket.off('students:list', handleParticipants);
     };
   }, [socket]);
+
+  // Debug: Add console log to check if function is being called
+  console.log('ChatModal rendered, socket:', socket, 'isLoading:', isLoading);
   
   const handleSendMessage = () => {
+    console.log('handleSendMessage called, newMessage:', newMessage, 'isLoading:', isLoading);
     if (newMessage.trim() !== '' && !isLoading) {
       const userMessage = {
         sender: studentName || 'Teacher',
@@ -139,11 +143,13 @@ Could you rephrase your question or ask about something specific I can help with
         timestamp: new Date().toISOString()
       };
       
+      console.log('Adding user message:', userMessage);
       // Add user message to chat immediately
       setMessages((prevMessages) => [...prevMessages, userMessage]);
       
       // Generate static AI response
       setIsLoading(true);
+      console.log('Starting AI response generation...');
       
       // Simulate AI thinking time
       setTimeout(() => {
@@ -154,6 +160,7 @@ Could you rephrase your question or ask about something specific I can help with
           timestamp: new Date().toISOString()
         };
         
+        console.log('Adding AI message:', aiMessage);
         setMessages((prevMessages) => [...prevMessages, aiMessage]);
         setIsLoading(false);
       }, 1000 + Math.random() * 1000); // Random delay between 1-2 seconds
