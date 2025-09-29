@@ -1,5 +1,11 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import io from "socket.io-client";
+import PollingService from '../services/pollingService';
+
+// Check if we're in production
+const isProduction = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
+
+// Always use polling service - no Socket.IO
+console.log('🌐 Using polling service for all environments');
 
 const SocketContext = createContext();
 export const useSocket = () => {
@@ -8,36 +14,36 @@ export const useSocket = () => {
 
 export const SocketManager = ({ children }) => {
   const [socket, setSocket] = useState(null);
+  const [connectionStatus, setConnectionStatus] = useState('connecting'); // 'connecting', 'connected', 'failed'
+  const [pollingService, setPollingService] = useState(null);
 
   useEffect(() => {
-    // Use local server for development, deployed server for production
-    const serverUrl = process.env.NODE_ENV === 'production' 
-      ? "https://poll-system-fgmos3tvd-sonys-projects-eca9a033.vercel.app"
-      : "http://localhost:5000";
-    const newSocket = io(serverUrl, {
-      transports: ['polling', 'websocket'],
-      timeout: 20000,
-      forceNew: true
+    console.log("🔍 Environment check:", {
+      hostname: window.location.hostname,
+      isProduction: isProduction
     });
-    setSocket(newSocket);
-
-    newSocket.on("connect", () => {
-      console.log("Successfully connected to the backend server!");
-    });
-
-    newSocket.on("disconnect", () => {
-      console.log("Disconnected from the server.");
-    });
-
-    newSocket.on("connect_error", (error) => {
-      console.error("Connection error:", error);
-    });
-
-    return () => newSocket.disconnect();
+    
+    // ALWAYS use polling service - no Socket.IO
+    console.log("🌐 Using polling service for all environments");
+    const service = new PollingService();
+    setPollingService(service);
+    setSocket(service);
+    setConnectionStatus('connected');
+    service.startPolling();
+    
+    return () => {
+      service.disconnect();
+    };
   }, []);
 
+  const value = {
+    socket,
+    connectionStatus,
+    isSocketConnected: connectionStatus === 'connected'
+  };
+
   return (
-    <SocketContext.Provider value={socket}>
+    <SocketContext.Provider value={value}>
       {children}
     </SocketContext.Provider>
   );
