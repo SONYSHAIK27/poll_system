@@ -41,8 +41,16 @@ class PollingService {
             if (response.ok) {
                 const poll = await response.json();
                 if (poll && JSON.stringify(poll) !== JSON.stringify(this.currentPoll)) {
+                    const wasNoPoll = !this.currentPoll;
                     this.currentPoll = poll;
-                    this.emit('poll:update', poll);
+                    
+                    // If there was no poll before and now there is one, emit poll:question
+                    if (wasNoPoll && poll) {
+                        this.emit('poll:question', poll);
+                    } else {
+                        // Otherwise emit poll:update for existing polls
+                        this.emit('poll:update', poll);
+                    }
                 }
             }
         } catch (error) {
@@ -79,7 +87,8 @@ class PollingService {
             if (response.ok) {
                 const result = await response.json();
                 this.currentPoll = result.poll;
-                this.emit('poll:created', result.poll);
+                // Emit the event that students are listening for
+                this.emit('poll:question', result.poll);
                 return result;
             }
         } catch (error) {
