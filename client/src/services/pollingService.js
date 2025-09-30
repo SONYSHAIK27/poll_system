@@ -89,6 +89,7 @@ class PollingService {
                 this.currentPoll = result.poll;
                 // Emit the event that students are listening for
                 this.emit('poll:question', result.poll);
+                console.log('📢 Poll created and poll:question event emitted:', result.poll);
                 return result;
             }
         } catch (error) {
@@ -211,7 +212,12 @@ class PollingService {
         } else if (event === 'teacher:join') {
             this.getStudents();
         } else if (event === 'poll:create') {
-            this.createPoll(data);
+            // Create poll and emit poll:question when done
+            this.createPoll(data).then(() => {
+                console.log('✅ Poll created successfully');
+            }).catch(error => {
+                console.error('❌ Error creating poll:', error);
+            });
         } else if (event === 'poll:answer') {
             this.submitAnswer(data.answer, this.getCurrentStudentId());
         } else if (event === 'student:kick') {

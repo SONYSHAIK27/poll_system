@@ -8,11 +8,16 @@ const StudentWaitView = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!socket) return;
+    if (!socket) {
+      console.log("❌ StudentWaitView: No socket available");
+      return;
+    }
+    
+    console.log("🎧 StudentWaitView: Setting up event listeners");
     
     // Listen for a new poll from the teacher
     const handlePollQuestion = (pollData) => {
-      console.log("Received a new poll:", pollData);
+      console.log("🎯 StudentWaitView: Received a new poll:", pollData);
       // When a poll is received, navigate to the student's poll page
       navigate('/student/poll', { state: { pollData } });
     };
@@ -23,6 +28,7 @@ const StudentWaitView = () => {
 
     socket.on('poll:question', handlePollQuestion);
     socket.on('student:kicked', handleKicked);
+    console.log("✅ StudentWaitView: Event listeners set up");
     
     // Clean up the event listener to prevent it from being added multiple times
     return () => {
